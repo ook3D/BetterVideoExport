@@ -10,7 +10,7 @@ project "BetterVideoExport"
     architecture "x86_64"
     targetextension ".asi"
 
-    files { "src/**.cpp", "src/**.c", "src/**.h" }
+    files { "src/**.cpp", "src/**.c", "src/**.h", "fx_asi_build.rc" }
     includedirs { "src", "src/MinHook", "src/spdlog" }
     buildoptions { "/utf-8" }   -- spdlog/fmt requires it
 
