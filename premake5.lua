@@ -8,7 +8,7 @@ project "BetterVideoExport"
     language "C++"
     cppdialect "C++17"
     architecture "x86_64"
-    targetextension ".asi"   -- ponytail: GTA5 loads DLLs renamed .asi
+    targetextension ".asi"
 
     files { "src/**.cpp", "src/**.c", "src/**.h" }
     includedirs { "src", "src/MinHook", "src/spdlog" }
