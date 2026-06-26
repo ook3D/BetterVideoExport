@@ -1,4 +1,4 @@
-# DisableEditorWatermark
+# BetterVideoExport
 Renders replays from Rockstar Editor using FFMPEG for higher quality + patches max bitrate and FPS.
 
 # Credits
