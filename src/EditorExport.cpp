@@ -1,35 +1,30 @@
 #include "EditorExport.h"
 #include <Hooking.h>
 #include "GameVersion.h"
+#include "Config.h"
 
 namespace EditorExport
 {
-    static constexpr uint32_t kExportBitrate = 100000000;   // 100 Mbit/s
-
-    // VBR quality percent (Win8+ path uses this, not avg-bitrate). 100 = max.
-    static constexpr uint32_t kQualityPercent = 100;
-
-    // Float written to the "60 FPS" toggle slot. The editor re-renders frame by
-    // frame on export, so this yields a real higher framerate. 0x42F00000 = 120.0f.
-    static constexpr float kHighFps = 120.0f;
-
     // H.264 level. 0x2A=4.2 (stock, caps ~62 Mbit @1080p). 0x33=5.1 lifts that to
     // ~240 Mbit and is the highest level Microsoft's H.264 encoder MFT accepts;
     // 5.2 (0x34) is rejected → "unknown error" on export. eAVEncH264VLevel5_1.
     static constexpr uint32_t kH264Level = 0x33;
 
-    // Max export resolution (stock 1920x1080). The editor clamps its output to
-    // this, so even a 4K source gets downscaled. 3840x2160 = native 4K UHD.
-    // NOTE: the MS encoder caps at level 5.1, which only covers 4K up to ~30 fps.
-    // 4K + the 120fps toggle may exceed it; use the 30fps option for 4K if so.
-    static constexpr uint32_t kMaxWidth = 3840;
-    static constexpr uint32_t kMaxHeight = 2160;
-    // -------------------------------------------------------------------------
-
     void Initialize()
     {
         if (!gameversion::IsLegacy())
             return;
+
+        Config::EnsureDefaultFile();
+
+        // From BetterVideoExport.ini [Export]; defaults match stock-improved values.
+        const uint32_t kExportBitrate   = Config::GetUInt(L"Export", L"Bitrate", 100000000); // 100 Mbit/s
+        const uint32_t kQualityPercent  = Config::GetUInt(L"Export", L"QualityPercent", 100); // VBR, 100=max
+        const float    kHighFps         = Config::GetFloat(L"Export", L"HighFps", 120.0f);
+        // NOTE: the MS encoder caps at level 5.1, which only covers 4K up to ~30 fps.
+        // 4K + the 120fps toggle may exceed it; use the 30fps option for 4K if so.
+        const uint32_t kMaxWidth        = Config::GetUInt(L"Export", L"MaxWidth", 3840);  // 4K UHD
+        const uint32_t kMaxHeight       = Config::GetUInt(L"Export", L"MaxHeight", 2160);
         {
             auto p = hook::pattern("48 8D 3D ? ? ? ? 41 8B C8 8B DA");
             if (p.size() > 0)

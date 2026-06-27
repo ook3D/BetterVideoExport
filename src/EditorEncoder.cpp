@@ -12,6 +12,7 @@
 #include <Hooking.h>
 #include "GameVersion.h"
 #include "Logging.h"
+#include "Config.h"
 
 #pragma comment(lib, "mfplat.lib")
 #pragma comment(lib, "mfuuid.lib")
@@ -19,8 +20,9 @@
 
 namespace EditorEncoder
 {
-    static const wchar_t* kVideoEncodeArgs = L"-c:v libx264 -preset medium -crf 16 -pix_fmt yuv420p";
-    static const wchar_t* kAudioEncodeArgs = L"-c:a aac -b:a 320k";
+    // Loaded from BetterVideoExport.ini [Encoder] in Initialize().
+    static std::wstring kVideoEncodeArgs = L"-c:v libx264 -preset medium -crf 16 -pix_fmt yuv420p";
+    static std::wstring kAudioEncodeArgs = L"-c:a aac -b:a 320k";
 
     static std::wstring g_ffmpegPath;   // empty => feature off, pass through to stock encoder
 
@@ -349,6 +351,10 @@ namespace EditorEncoder
     {
         if (!gameversion::IsLegacy())
             return;
+
+        Config::EnsureDefaultFile();
+        kVideoEncodeArgs = Config::GetStr(L"Encoder", L"VideoArgs", kVideoEncodeArgs.c_str());
+        kAudioEncodeArgs = Config::GetStr(L"Encoder", L"AudioArgs", kAudioEncodeArgs.c_str());
 
         g_ffmpegPath = FindFfmpeg();
         if (g_ffmpegPath.empty())
