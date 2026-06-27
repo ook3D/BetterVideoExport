@@ -239,8 +239,7 @@ namespace EditorEncoder
         void OpenWav()
         {
             m_wavPath = m_finalUrl + L".tmpaudio.wav";
-            m_wav = CreateFileW(m_wavPath.c_str(), GENERIC_WRITE, 0, nullptr,
-                                CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+            m_wav = CreateFileW(m_wavPath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
             if (m_wav == INVALID_HANDLE_VALUE) { m_wav = nullptr; return; }
             BYTE hdr[44] = {};
             DWORD w = 0;
@@ -256,15 +255,24 @@ namespace EditorEncoder
             const uint32_t riffSize = 36 + dataSize;
 
             BYTE h[44];
-            memcpy(h + 0, "RIFF", 4);              memcpy(h + 4, &riffSize, 4);
-            memcpy(h + 8, "WAVE", 4);              memcpy(h + 12, "fmt ", 4);
-            uint32_t fmtSize = 16; memcpy(h + 16, &fmtSize, 4);
-            uint16_t pcm = 1;      memcpy(h + 20, &pcm, 2);
-            uint16_t ch = (uint16_t)m_channels; memcpy(h + 22, &ch, 2);
-            memcpy(h + 24, &m_sampleRate, 4);      memcpy(h + 28, &byteRate, 4);
-            uint16_t ba = (uint16_t)blockAlign; memcpy(h + 32, &ba, 2);
-            uint16_t bits = (uint16_t)m_bits;   memcpy(h + 34, &bits, 2);
-            memcpy(h + 36, "data", 4);             memcpy(h + 40, &dataSize, 4);
+            memcpy(h + 0, "RIFF", 4);
+            memcpy(h + 4, &riffSize, 4);
+            memcpy(h + 8, "WAVE", 4);
+            memcpy(h + 12, "fmt ", 4);
+            uint32_t fmtSize = 16;
+            memcpy(h + 16, &fmtSize, 4);
+            uint16_t pcm = 1;
+            memcpy(h + 20, &pcm, 2);
+            uint16_t ch = (uint16_t)m_channels;
+            memcpy(h + 22, &ch, 2);
+            memcpy(h + 24, &m_sampleRate, 4);
+            memcpy(h + 28, &byteRate, 4);
+            uint16_t ba = (uint16_t)blockAlign; 
+            memcpy(h + 32, &ba, 2);
+            uint16_t bits = (uint16_t)m_bits;
+            memcpy(h + 34, &bits, 2);
+            memcpy(h + 36, "data", 4);
+            memcpy(h + 40, &dataSize, 4);
 
             SetFilePointer(m_wav, 0, nullptr, FILE_BEGIN);
             DWORD w = 0; WriteFile(m_wav, h, sizeof(h), &w, nullptr);
@@ -312,8 +320,7 @@ namespace EditorEncoder
         bool m_failed = false;
     };
 
-    using MFCreateSinkWriterFromURL_t =
-        HRESULT(STDAPICALLTYPE*)(LPCWSTR, IMFByteStream*, IMFAttributes*, IMFSinkWriter**);
+    using MFCreateSinkWriterFromURL_t = HRESULT(STDAPICALLTYPE*)(LPCWSTR, IMFByteStream*, IMFAttributes*, IMFSinkWriter**);
     static MFCreateSinkWriterFromURL_t g_origCreate = nullptr;
 
     static HRESULT STDAPICALLTYPE Hooked_Create(LPCWSTR url, IMFByteStream* bs, IMFAttributes* attr, IMFSinkWriter** out)

@@ -11,7 +11,7 @@ project "BetterVideoExport"
     targetextension ".asi"
 
     files { "src/**.cpp", "src/**.c", "src/**.h", "fx_asi_build.rc" }
-    includedirs { "src", "src/MinHook", "src/spdlog" }
+    includedirs { "src", "src/MinHook", "src/spdlog", "src/hooking" }
     buildoptions { "/utf-8" }   -- spdlog/fmt requires it
 
     filter "configurations:Debug"
